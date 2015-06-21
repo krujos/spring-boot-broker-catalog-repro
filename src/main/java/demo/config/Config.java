@@ -1,11 +1,13 @@
 package demo.config;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerAsyncRequiredException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
+import org.cloudfoundry.community.servicebroker.model.BrokerApiVersion;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
@@ -18,15 +20,26 @@ import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 @Configuration
 public class Config {
+	private Logger log = Logger.getLogger(Config.class);
+
+	@Bean
+	public Catalog getCatalog() {
+		return new Catalog();
+	}
 
 	@Bean
 	public CatalogService newCatalogService() {
-		return new CatalogService() {
+		log.info("NEW CATALOG SERVICE");
+
+		@Service
+		class MyCatalogService implements CatalogService {
 
 			@Override
 			public Catalog getCatalog() {
@@ -38,7 +51,9 @@ public class Config {
 				return new ServiceDefinition();
 			}
 
-		};
+		}
+
+		return new MyCatalogService();
 	}
 
 	@Bean
@@ -99,5 +114,12 @@ public class Config {
 				return null;
 			}
 		};
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(BrokerApiVersion.class)
+	public BrokerApiVersion brokerApiVersion() {
+		log.info("BROKER API VERSION");
+		return new BrokerApiVersion("2.4");
 	}
 }
