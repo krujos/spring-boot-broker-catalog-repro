@@ -20,7 +20,6 @@ import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
@@ -117,7 +116,6 @@ public class Config {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(BrokerApiVersion.class)
 	public BrokerApiVersion brokerApiVersion() {
 		log.info("BROKER API VERSION");
 		return new BrokerApiVersion("2.4");
